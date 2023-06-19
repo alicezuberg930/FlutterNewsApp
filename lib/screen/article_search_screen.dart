@@ -76,7 +76,7 @@ class _SearchScreenState extends State<SearchScreen> {
       shrinkWrap: true,
       itemCount: Article.articles.length,
       itemBuilder: (context, index) =>
-          articleListTile(Article.articles[index], context),
+          ArticleListTile(article: Article.articles[index]),
     );
   }
 }

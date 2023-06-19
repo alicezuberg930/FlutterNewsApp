@@ -1,8 +1,8 @@
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:news_app/model/article.dart';
 import 'package:news_app/service/news_api.dart';
 import 'package:news_app/widget/article_list_tile.dart';
-import 'package:news_app/widget/article_slider_tiles.dart';
+import 'package:news_app/widget/article_slider_tile.dart';
 import 'package:news_app/widget/search_bar.dart';
 
 class HomePage extends StatefulWidget {
@@ -17,7 +17,7 @@ class _HomePageState extends State<HomePage>
   NewsAPI news = NewsAPI();
   List<Tab> tabList = const [
     Tab(
-      child: Text("All news"),
+      child: Text("Everything"),
     ),
     Tab(
       child: Text("Fashion"),
@@ -36,8 +36,8 @@ class _HomePageState extends State<HomePage>
     )
   ];
   TabController? tabController;
-
   TextEditingController searchController = TextEditingController();
+
   @override
   void initState() {
     tabController = TabController(length: tabList.length, vsync: this);
@@ -47,6 +47,7 @@ class _HomePageState extends State<HomePage>
   @override
   void dispose() {
     tabController!.dispose();
+    searchController.dispose();
     super.dispose();
   }
 
@@ -88,6 +89,7 @@ class _HomePageState extends State<HomePage>
         controller: tabController,
         children: [
           SingleChildScrollView(
+            physics: const ClampingScrollPhysics(),
             padding: const EdgeInsets.all(5),
             child: Column(
               children: [
@@ -169,7 +171,7 @@ class _HomePageState extends State<HomePage>
                   scrollDirection: Axis.horizontal,
                   itemCount: snapshot.data!.length,
                   itemBuilder: (context, index) =>
-                      articleSliderTile(snapshot.data![index], context));
+                      ArticleSliderTile(article: snapshot.data![index]));
             } else if (snapshot.hasError) {
               return Center(
                 child: Text(
@@ -202,9 +204,10 @@ class _HomePageState extends State<HomePage>
             if (snapshot.hasData) {
               return ListView.builder(
                   shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
                   itemCount: snapshot.data!.length,
                   itemBuilder: (context, index) =>
-                      articleListTile(snapshot.data![index], context));
+                      ArticleListTile(article: snapshot.data![index]));
             } else if (snapshot.hasError) {
               return Center(
                 child: Text(

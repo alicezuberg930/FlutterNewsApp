@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:news_app/model/article.dart';
-import 'package:news_app/widget/share_widget.dart';
 import 'package:share_plus/share_plus.dart';
 
 class ArticleDetailsScreen extends StatelessWidget {
@@ -24,18 +23,31 @@ class ArticleDetailsScreen extends StatelessWidget {
                   clipBehavior: Clip.none,
                   alignment: Alignment.bottomRight,
                   children: [
-                    Container(
+                    SizedBox(
                       height: MediaQuery.of(context).size.height * 0.4,
                       width: MediaQuery.of(context).size.width,
-                      decoration: BoxDecoration(
-                        borderRadius: const BorderRadius.only(
-                          bottomLeft: Radius.circular(15),
-                          bottomRight: Radius.circular(15),
+                      child: ClipRRect(
+                        borderRadius: const BorderRadius.vertical(
+                          bottom: Radius.circular(10),
                         ),
-                        image: DecorationImage(
+                        child: Image.network(
+                          article.urlToImage ??
+                              "https://t3.ftcdn.net/jpg/05/01/98/72/360_F_501987255_kb5LZcBmlcz00IejLlxpklpTbJ9ys5i8.jpg",
+                          filterQuality: FilterQuality.none,
                           fit: BoxFit.cover,
-                          image: NetworkImage(article.urlToImage ??
-                              "https://t3.ftcdn.net/jpg/05/01/98/72/360_F_501987255_kb5LZcBmlcz00IejLlxpklpTbJ9ys5i8.jpg"),
+                          loadingBuilder: (context, child, loadingProgress) {
+                            if (loadingProgress == null) return child;
+                            return Center(
+                              child: CircularProgressIndicator(
+                                color: Colors.blue,
+                                value: loadingProgress.expectedTotalBytes !=
+                                        null
+                                    ? loadingProgress.cumulativeBytesLoaded /
+                                        loadingProgress.expectedTotalBytes!
+                                    : null,
+                              ),
+                            );
+                          },
                         ),
                       ),
                     ),
@@ -82,7 +94,8 @@ class ArticleDetailsScreen extends StatelessWidget {
                               ),
                               onPressed: () async {
                                 await Share.share(
-                                    'Bài báo này thật tuyệt: ${article.url!}');
+                                  'Bài báo này thật tuyệt: ${article.url!}',
+                                );
                               },
                             ),
                           ),
@@ -102,7 +115,7 @@ class ArticleDetailsScreen extends StatelessWidget {
                                 Icons.favorite,
                                 color: Colors.red,
                               ),
-                              onPressed: () => {Navigator.pop(context)},
+                              onPressed: () => Navigator.pop(context),
                             ),
                           ),
                         ],
