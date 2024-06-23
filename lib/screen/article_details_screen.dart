@@ -5,8 +5,7 @@ import 'package:share_plus/share_plus.dart';
 class ArticleDetailsScreen extends StatelessWidget {
   final Article article;
 
-  const ArticleDetailsScreen({Key? key, required this.article})
-      : super(key: key);
+  const ArticleDetailsScreen({Key? key, required this.article}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -16,7 +15,6 @@ class ArticleDetailsScreen extends StatelessWidget {
         children: [
           SingleChildScrollView(
             child: Column(
-              // mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 Stack(
@@ -27,28 +25,34 @@ class ArticleDetailsScreen extends StatelessWidget {
                       height: MediaQuery.of(context).size.height * 0.4,
                       width: MediaQuery.of(context).size.width,
                       child: ClipRRect(
-                        borderRadius: const BorderRadius.vertical(
-                          bottom: Radius.circular(10),
-                        ),
-                        child: Image.network(
-                          article.urlToImage ??
-                              "https://t3.ftcdn.net/jpg/05/01/98/72/360_F_501987255_kb5LZcBmlcz00IejLlxpklpTbJ9ys5i8.jpg",
-                          filterQuality: FilterQuality.none,
-                          fit: BoxFit.cover,
-                          loadingBuilder: (context, child, loadingProgress) {
-                            if (loadingProgress == null) return child;
-                            return Center(
-                              child: CircularProgressIndicator(
-                                color: Colors.blue,
-                                value: loadingProgress.expectedTotalBytes !=
-                                        null
-                                    ? loadingProgress.cumulativeBytesLoaded /
-                                        loadingProgress.expectedTotalBytes!
-                                    : null,
+                        borderRadius: const BorderRadius.vertical(bottom: Radius.circular(10)),
+                        child: article.urlToImage != null
+                            ? Image.network(
+                                article.urlToImage!,
+                                filterQuality: FilterQuality.none,
+                                fit: BoxFit.cover,
+                                loadingBuilder: (context, child, loadingProgress) {
+                                  if (loadingProgress == null) return child;
+                                  return Center(
+                                    child: CircularProgressIndicator(
+                                      color: Colors.blue,
+                                      value: loadingProgress.expectedTotalBytes != null
+                                          ? loadingProgress.cumulativeBytesLoaded / loadingProgress.expectedTotalBytes!
+                                          : null,
+                                    ),
+                                  );
+                                },
+                                errorBuilder: (context, error, stackTrace) {
+                                  return Image.asset(
+                                    'assets/images/error_not_found.jpg',
+                                    fit: BoxFit.cover,
+                                  );
+                                },
+                              )
+                            : Image.asset(
+                                'assets/images/error_not_found.jpg',
+                                fit: BoxFit.cover,
                               ),
-                            );
-                          },
-                        ),
                       ),
                     ),
                     Positioned(
@@ -58,9 +62,7 @@ class ArticleDetailsScreen extends StatelessWidget {
                         decoration: BoxDecoration(
                           color: Colors.white,
                           borderRadius: BorderRadius.circular(50),
-                          boxShadow: const [
-                            BoxShadow(color: Colors.black, blurRadius: 5)
-                          ],
+                          boxShadow: const [BoxShadow(color: Colors.black, blurRadius: 5)],
                         ),
                         padding: const EdgeInsets.all(5),
                         child: IconButton(
@@ -82,9 +84,7 @@ class ArticleDetailsScreen extends StatelessWidget {
                             decoration: BoxDecoration(
                               color: Colors.white,
                               borderRadius: BorderRadius.circular(50),
-                              boxShadow: const [
-                                BoxShadow(color: Colors.black, blurRadius: 5)
-                              ],
+                              boxShadow: const [BoxShadow(color: Colors.black, blurRadius: 5)],
                             ),
                             padding: const EdgeInsets.all(5),
                             child: IconButton(
@@ -105,9 +105,7 @@ class ArticleDetailsScreen extends StatelessWidget {
                             decoration: BoxDecoration(
                               color: Colors.white,
                               borderRadius: BorderRadius.circular(50),
-                              boxShadow: const [
-                                BoxShadow(color: Colors.black, blurRadius: 5)
-                              ],
+                              boxShadow: const [BoxShadow(color: Colors.black, blurRadius: 5)],
                             ),
                             padding: const EdgeInsets.all(5),
                             child: IconButton(
@@ -124,53 +122,59 @@ class ArticleDetailsScreen extends StatelessWidget {
                   ],
                 ),
                 const SizedBox(height: 40),
-                Text(
-                  article.author ?? "Không tác giả",
-                  style: const TextStyle(
-                    color: Colors.black,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 20,
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 10),
+                  child: Column(
+                    children: [
+                      Text(
+                        article.author ?? "Không tác giả",
+                        style: const TextStyle(
+                          color: Colors.black,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 20,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Container(
+                        padding: const EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          color: Colors.red,
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Text(
+                          article.source?.name ?? 'Anonymous',
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        article.title ?? 'Tựa đề rỗng',
+                        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        "Ngày đăng: ${article.publishedAt?.split('T')[0] ?? 'Chưa xác định'}",
+                        style: const TextStyle(fontSize: 14),
+                      ),
+                      const SizedBox(height: 8),
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 8),
+                        child: Text(
+                          article.content ?? 'Chưa có bình luận',
+                          style: const TextStyle(fontSize: 16),
+                        ),
+                      )
+                    ],
                   ),
                 ),
-                const SizedBox(height: 8),
-                Container(
-                  padding: const EdgeInsets.all(8),
-                  decoration: BoxDecoration(
-                    color: Colors.red,
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Text(
-                    article.source?.name ?? 'Anonymous',
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  article.title ?? 'Tựa đề rỗng',
-                  style: const TextStyle(
-                      fontWeight: FontWeight.bold, fontSize: 18),
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  "Ngày đăng: ${article.publishedAt?.split('T')[0] ?? 'Chưa xác định'}",
-                  style: const TextStyle(fontSize: 14),
-                ),
-                const SizedBox(height: 8),
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8),
-                  child: Text(
-                    article.content ?? 'Chưa có bình luận',
-                    style: const TextStyle(fontSize: 16),
-                  ),
-                )
               ],
             ),
           ),
           Padding(
-            padding: const EdgeInsets.only(top: 12),
+            padding: const EdgeInsets.only(top: 20),
             child: IconButton(
               onPressed: () {
                 Navigator.pop(context);

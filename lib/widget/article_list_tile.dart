@@ -25,15 +25,37 @@ class ArticleListTile extends StatelessWidget {
           children: [
             Expanded(
               flex: 4,
-              child: Container(
-                height: 110,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(6),
-                  image: DecorationImage(
-                    fit: BoxFit.cover,
-                    image: NetworkImage(article.urlToImage ??
-                        "https://t3.ftcdn.net/jpg/05/01/98/72/360_F_501987255_kb5LZcBmlcz00IejLlxpklpTbJ9ys5i8.jpg"),
-                  ),
+              child: SizedBox(
+                height: 120,
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(10),
+                  child: article.urlToImage != null
+                      ? Image.network(
+                          article.urlToImage!,
+                          filterQuality: FilterQuality.none,
+                          fit: BoxFit.cover,
+                          errorBuilder: (context, error, stackTrace) {
+                            return Image.asset(
+                              'assets/images/error_not_found.jpg',
+                              fit: BoxFit.cover,
+                            );
+                          },
+                          loadingBuilder: (context, child, loadingProgress) {
+                            if (loadingProgress == null) return child;
+                            return Center(
+                              child: CircularProgressIndicator(
+                                color: Colors.blue,
+                                value: loadingProgress.expectedTotalBytes != null
+                                    ? loadingProgress.cumulativeBytesLoaded / loadingProgress.expectedTotalBytes!
+                                    : null,
+                              ),
+                            );
+                          },
+                        )
+                      : Image.asset(
+                          'assets/images/error_not_found.jpg',
+                          fit: BoxFit.cover,
+                        ),
                 ),
               ),
             ),
@@ -44,30 +66,25 @@ class ArticleListTile extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 6,
-                            vertical: 3,
-                          ),
-                          decoration: BoxDecoration(
-                            color: Colors.red,
-                            borderRadius: BorderRadius.circular(30),
-                          ),
-                          child: Text(
-                            article.source?.name ?? 'Anonymous',
-                            style: const TextStyle(color: Colors.white),
-                            overflow: TextOverflow.ellipsis,
-                            maxLines: 2,
-                          ),
-                        ),
-                        Text(
-                          article.publishedAt?.split('T')[0] ?? 'Chưa xác định',
-                        ),
-                      ],
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 6,
+                        vertical: 3,
+                      ),
+                      decoration: BoxDecoration(
+                        color: Colors.red,
+                        borderRadius: BorderRadius.circular(30),
+                      ),
+                      child: Text(
+                        article.source?.name ?? 'Anonymous',
+                        style: const TextStyle(color: Colors.white),
+                        overflow: TextOverflow.ellipsis,
+                        maxLines: 2,
+                      ),
+                    ),
+                    const SizedBox(height: 5),
+                    Text(
+                      article.publishedAt?.split('T')[0] ?? 'Chưa xác định',
                     ),
                     const SizedBox(height: 15),
                     Text(

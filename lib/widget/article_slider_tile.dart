@@ -10,82 +10,83 @@ class ArticleSliderTile extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       margin: const EdgeInsets.only(right: 10),
-      width: 300,
+      width: MediaQuery.of(context).size.width * 0.8,
+      decoration: BoxDecoration(borderRadius: BorderRadius.circular(10)),
       child: InkWell(
         onTap: () {
           Navigator.push(
             context,
-            MaterialPageRoute(
-              builder: (context) => ArticleDetailsScreen(article: article),
-            ),
+            MaterialPageRoute(builder: (context) => ArticleDetailsScreen(article: article)),
           );
         },
-        child: SizedBox(
-          child: Stack(
-            alignment: Alignment.bottomLeft,
-            children: [
-              SizedBox(
-                width: double.infinity,
-                height: double.infinity,
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(10),
-                  child: Image.network(
-                    article.urlToImage ??
-                        "https://t3.ftcdn.net/jpg/05/01/98/72/360_F_501987255_kb5LZcBmlcz00IejLlxpklpTbJ9ys5i8.jpg",
-                    filterQuality: FilterQuality.none,
-                    fit: BoxFit.cover,
-                    loadingBuilder: (context, child, loadingProgress) {
-                      if (loadingProgress == null) return child;
-                      return Center(
-                        child: CircularProgressIndicator(
-                          color: Colors.blue,
-                          value: loadingProgress.expectedTotalBytes != null
-                              ? loadingProgress.cumulativeBytesLoaded /
-                                  loadingProgress.expectedTotalBytes!
-                              : null,
-                        ),
-                      );
-                    },
+        child: Column(
+          children: [
+            SizedBox(
+              width: double.infinity,
+              height: MediaQuery.of(context).size.height * 0.25,
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(10),
+                child: article.urlToImage != null
+                    ? Image.network(
+                        article.urlToImage!,
+                        filterQuality: FilterQuality.none,
+                        fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) {
+                          return Image.asset(
+                            'assets/images/error_not_found.jpg',
+                            fit: BoxFit.cover,
+                          );
+                        },
+                        loadingBuilder: (context, child, loadingProgress) {
+                          if (loadingProgress == null) return child;
+                          return Center(
+                            child: CircularProgressIndicator(
+                              color: Colors.blue,
+                              value: loadingProgress.expectedTotalBytes != null
+                                  ? loadingProgress.cumulativeBytesLoaded / loadingProgress.expectedTotalBytes!
+                                  : null,
+                            ),
+                          );
+                        },
+                      )
+                    : Image.asset(
+                        'assets/images/error_not_found.jpg',
+                        fit: BoxFit.cover,
+                      ),
+              ),
+            ),
+            const SizedBox(height: 5),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 6,
+                    vertical: 3,
+                  ),
+                  decoration: BoxDecoration(
+                    color: Colors.red,
+                    borderRadius: BorderRadius.circular(30),
+                  ),
+                  child: Text(
+                    article.source?.name ?? 'Anonymous',
+                    style: const TextStyle(color: Colors.white),
                   ),
                 ),
-              ),
-              Container(
-                padding: const EdgeInsets.only(left: 15, right: 15, bottom: 8),
-                height: 80,
-                width: double.infinity,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 6,
-                        vertical: 3,
-                      ),
-                      decoration: BoxDecoration(
-                        color: Colors.red,
-                        borderRadius: BorderRadius.circular(30),
-                      ),
-                      child: Text(
-                        article.source?.name ?? 'Anonymous',
-                        style: const TextStyle(color: Colors.white),
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      article.title ?? 'Chưa xác định',
-                      style: const TextStyle(
-                        color: Colors.black,
-                        fontWeight: FontWeight.bold,
-                      ),
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ],
+                const SizedBox(height: 5),
+                Text(
+                  article.title ?? 'Chưa xác định',
+                  style: const TextStyle(
+                    color: Colors.black,
+                    fontWeight: FontWeight.bold,
+                  ),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
                 ),
-              )
-            ],
-          ),
+              ],
+            )
+          ],
         ),
       ),
     );
