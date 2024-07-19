@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:news_app/screen/article_search_screen.dart';
+import 'package:news_app/screen/favorite_article_screen.dart';
 import 'package:news_app/service/news_api.dart';
 import 'package:news_app/widget/article_list_tile.dart';
 import 'package:news_app/widget/article_slider_tile.dart';
@@ -13,6 +14,7 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin {
   NewsAPI news = NewsAPI();
+  GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
   List<Tab> tabList = const [
     Tab(
       child: Text("Everything"),
@@ -53,20 +55,22 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
+        key: scaffoldKey,
+        drawer: customDrawerWidget(),
         appBar: AppBar(
           title: const Text('News app'),
-          leading: IconButton(
-            icon: const Icon(Icons.search, color: Colors.white),
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => const ArticleSearchScreen(),
-                ),
-              );
-            },
-          ),
           elevation: 8,
+          actions: [
+            IconButton(
+              icon: const Icon(Icons.search, color: Colors.white),
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const ArticleSearchScreen()),
+                );
+              },
+            ),
+          ],
           bottom: PreferredSize(
             preferredSize: const Size.fromHeight(45),
             child: TabBar(
@@ -145,16 +149,6 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
   newsSlider(String option, String query) {
     return Container(
       margin: const EdgeInsets.only(left: 5, top: 5),
-      // child: SizedBox(
-      //   height: MediaQuery.of(context).size.height * 0.3,
-      //   child: ListView.builder(
-      //     shrinkWrap: true,
-      //     scrollDirection: Axis.horizontal,
-      //     itemCount: Article.articles.length,
-      //     itemBuilder: (context, index) =>
-      //         articleSliderTile(Article.articles[index], context),
-      //   ),
-      // ),
       child: SizedBox(
         height: MediaQuery.of(context).size.height * 0.35,
         child: FutureBuilder(
@@ -221,24 +215,138 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
     );
   }
 
-  // newsBody(String option, String query) {
-  //   return Column(
-  //     mainAxisAlignment: MainAxisAlignment.start,
-  //     crossAxisAlignment: CrossAxisAlignment.start,
-  //     children: [
-  //       const Text(
-  //         "Trending",
-  //         style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
-  //       ),
-  //       const SizedBox(height: 15),
-  //       ListView.builder(
-  //         physics: const NeverScrollableScrollPhysics(),
-  //         shrinkWrap: true,
-  //         itemCount: Article.articles.length,
-  //         itemBuilder: (context, index) =>
-  //             articleListTile(Article.articles[index], context),
-  //       ),
-  //     ],
-  //   );
-  // }
+  toggleDrawer() async {
+    if (scaffoldKey.currentState!.isDrawerOpen) {
+      scaffoldKey.currentState!.openEndDrawer();
+    } else {
+      scaffoldKey.currentState!.openDrawer();
+    }
+  }
+
+  customDrawerWidget() {
+    return Drawer(
+      backgroundColor: Colors.white,
+      child: ListView(
+        padding: const EdgeInsets.symmetric(vertical: 20),
+        children: [
+          // Container(
+          //   alignment: Alignment.center,
+          //   child: Stack(
+          //     children: [
+          //       ClipRRect(
+          //         borderRadius: BorderRadius.circular(100),
+          //         child: Image(
+          //           image: NetworkImage(widget.user.avatar!),
+          //           height: 120,
+          //           width: 120,
+          //           fit: BoxFit.cover,
+          //           filterQuality: FilterQuality.high,
+          //         ),
+          //       ),
+          //       Positioned(
+          //         bottom: 5,
+          //         right: 5,
+          //         child: Container(
+          //           padding: const EdgeInsets.all(10),
+          //           decoration: BoxDecoration(
+          //             color: Colors.grey,
+          //             borderRadius: BorderRadius.circular(50),
+          //           ),
+          //           child: InkWell(
+          //             onTap: () => showImagePicker(context, chooseImage),
+          //             child: const Icon(Icons.camera_alt, color: Constants.primaryColor, size: 20),
+          //           ),
+          //         ),
+          //       ),
+          //     ],
+          //   ),
+          // ),
+          // const SizedBox(height: 15),
+          // Text(
+          //   widget.user.name!,
+          //   textAlign: TextAlign.center,
+          //   style: TextStyle(
+          //     fontWeight: FontWeight.bold,
+          //     fontSize: 22,
+          //     color: isDarkMode ? Colors.white : Colors.black,
+          //   ),
+          // ),
+          // const SizedBox(height: 20),
+          // Divider(height: 4, color: Colors.black),
+          ListTile(
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const FavoriteArticlesScreen()),
+              );
+            },
+            contentPadding: const EdgeInsets.symmetric(horizontal: 15, vertical: 2),
+            leading: const Icon(Icons.favorite, color: Colors.red),
+            title: const Text(
+              "Favorite articles",
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                color: Colors.black,
+              ),
+            ),
+          ),
+          // ListTile(
+          //   onTap: () async => {
+          //     showDialog(
+          //       barrierDismissible: false,
+          //       context: context,
+          //       builder: (context) {
+          //         return AlertDialog(
+          //           elevation: 5,
+          //           title: const Row(
+          //             children: [
+          //               Icon(Icons.warning),
+          //               SizedBox(width: 5),
+          //               Text(
+          //                 "Alert",
+          //                 style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+          //               ),
+          //             ],
+          //           ),
+          //           content: const Text("Are you sure you want to log out?"),
+          //           actions: [
+          //             GestureDetector(
+          //               child: ElevatedButton(
+          //                 style: ElevatedButton.styleFrom(padding: const EdgeInsets.all(10)),
+          //                 onPressed: () => {Navigator.pop(context)},
+          //                 child: const Text("No"),
+          //               ),
+          //             ),
+          //             GestureDetector(
+          //               child: ElevatedButton(
+          //                 style: ElevatedButton.styleFrom(
+          //                   padding: const EdgeInsets.all(10),
+          //                   backgroundColor: Colors.yellow[700],
+          //                 ),
+          //                 onPressed: () async {
+          //                   SharedPreference.clearAllData();
+          //                   Navigator.of(Constants().navigatorKey.currentContext!).pushNamed(RouteGeneratorService.loginScreen);
+          //                 },
+          //                 child: const Text("Yes"),
+          //               ),
+          //             ),
+          //           ],
+          //         );
+          //       },
+          //     ),
+          //   },
+          //   contentPadding: const EdgeInsets.symmetric(horizontal: 15, vertical: 2),
+          //   leading: const Icon(Icons.exit_to_app, color: Constants.primaryColor),
+          //   title: Text(
+          //     "Log out",
+          //     style: TextStyle(
+          //       fontWeight: FontWeight.bold,
+          //       color: isDarkMode ? Colors.white : Colors.black,
+          //     ),
+          //   ),
+          // ),
+        ],
+      ),
+    );
+  }
 }

@@ -1,10 +1,14 @@
+// ignore_for_file: must_be_immutable
+
 import 'package:flutter/material.dart';
 import 'package:news_app/model/article.dart';
 import 'package:news_app/screen/article_details_screen.dart';
 
 class ArticleListTile extends StatelessWidget {
   final Article article;
-  const ArticleListTile({super.key, required this.article});
+  void Function()? onDeletePress;
+  bool isFavorite;
+  ArticleListTile({super.key, required this.article, this.onDeletePress, this.isFavorite = false});
 
   @override
   Widget build(BuildContext context) {
@@ -66,26 +70,32 @@ class ArticleListTile extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 6,
-                        vertical: 3,
-                      ),
-                      decoration: BoxDecoration(
-                        color: Colors.red,
-                        borderRadius: BorderRadius.circular(30),
-                      ),
-                      child: Text(
-                        article.source?.name ?? 'Anonymous',
-                        style: const TextStyle(color: Colors.white),
-                        overflow: TextOverflow.ellipsis,
-                        maxLines: 2,
-                      ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 6,
+                            vertical: 3,
+                          ),
+                          decoration: BoxDecoration(
+                            color: Colors.red,
+                            borderRadius: BorderRadius.circular(30),
+                          ),
+                          child: Text(
+                            article.source?.name ?? 'Anonymous',
+                            style: const TextStyle(color: Colors.white),
+                            overflow: TextOverflow.ellipsis,
+                            maxLines: 2,
+                          ),
+                        ),
+                        if (isFavorite) ...[
+                          IconButton(onPressed: onDeletePress, icon: const Icon(Icons.delete, color: Colors.red)),
+                        ]
+                      ],
                     ),
                     const SizedBox(height: 5),
-                    Text(
-                      article.publishedAt?.split('T')[0] ?? 'Chưa xác định',
-                    ),
+                    Text(article.publishedAt?.split('T')[0] ?? 'Chưa xác định'),
                     const SizedBox(height: 15),
                     Text(
                       article.title ?? 'Tựa đề rỗng',

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:news_app/common/shared_preferences.dart';
 import 'package:news_app/model/article.dart';
 import 'package:news_app/service/news_api.dart';
 import 'package:news_app/widget/article_list_tile.dart';
@@ -14,96 +15,66 @@ class _SearchScreenState extends State<ArticleSearchScreen> {
   NewsAPI news = NewsAPI();
   TextEditingController searchController = TextEditingController();
   List<Article> articles = [];
+  bool isLoading = false;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        flexibleSpace: Container(
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              colors: [Colors.deepPurple, Colors.purple.shade300],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-            ),
-          ),
-        ),
-        title: TextField(
-          textAlignVertical: TextAlignVertical.center,
-          controller: searchController,
-          style: const TextStyle(color: Colors.white),
-          cursorColor: Colors.white,
-          decoration: const InputDecoration(
-            isCollapsed: true,
-            prefixIcon: Icon(
-              Icons.search,
-              color: Colors.white,
-            ),
-            hintText: 'Tìm kiếm',
-            hintStyle: TextStyle(color: Colors.white54),
-            border: InputBorder.none,
-          ),
-          onSubmitted: (value) {
-            if (searchController.text.length > 3) {
-              setState(() {
-                articles = news.searchArticles(searchController.text);
-              });
-            }
-          },
-        ),
-        elevation: 8,
-        centerTitle: true,
-      ),
-      body: articles.isNotEmpty
-          ? ListView.builder(
-              shrinkWrap: true,
-              physics: const AlwaysScrollableScrollPhysics(),
-              itemCount: articles.length,
-              itemBuilder: (context, index) => ArticleListTile(article: articles[index]),
-            )
-          : Container(
-              height: MediaQuery.of(context).size.height,
-              alignment: Alignment.center,
-              child: const Text(
-                'No articles found',
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 35),
+        appBar: AppBar(
+          flexibleSpace: Container(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [Colors.deepPurple, Colors.purple.shade300],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
               ),
             ),
-    );
-  }
-
-  searchResultWidget() {
-    return FutureBuilder(
-      future: news.getAllArticles("everything", searchController.text),
-      builder: (context, snapshot) {
-        if (snapshot.hasData) {
-          return ListView.builder(
-            shrinkWrap: true,
-            // physics: const AlwaysScrollableScrollPhysics(),
-            physics: const NeverScrollableScrollPhysics(),
-            itemCount: snapshot.data!.length,
-            itemBuilder: (context, index) => ArticleListTile(article: snapshot.data![index]),
-          );
-        } else if (snapshot.hasError) {
-          return Center(
-            child: Text(
-              snapshot.error.toString(),
-              style: const TextStyle(fontSize: 20, color: Colors.red),
+          ),
+          title: TextField(
+            textAlignVertical: TextAlignVertical.center,
+            controller: searchController,
+            style: const TextStyle(color: Colors.white),
+            cursorColor: Colors.white,
+            decoration: const InputDecoration(
+              isCollapsed: true,
+              prefixIcon: Icon(
+                Icons.search,
+                color: Colors.white,
+              ),
+              hintText: 'Tìm kiếm',
+              hintStyle: TextStyle(color: Colors.white54),
+              border: InputBorder.none,
             ),
-          );
-        } else {
-          return const Center(child: CircularProgressIndicator());
-        }
-      },
-    );
+            onSubmitted: (value) async {
+              if (searchController.text.length > 3) {
+                setState(() => isLoading = true);
+                final searchArticles = await news.getAllArticles("everything", "&q=${searchController.text}&sortBy=publishedAt");
+                setState(() {
+                  isLoading = false;
+                  articles = searchArticles;
+                });
+              }
+            },
+          ),
+          elevation: 8,
+          centerTitle: true,
+        ),
+        body: isLoading
+            ? const Center(child: CircularProgressIndicator(color: Colors.yellow))
+            : articles.isNotEmpty
+                ? ListView.builder(
+                    shrinkWrap: true,
+                    physics: const AlwaysScrollableScrollPhysics(),
+                    itemCount: articles.length,
+                    itemBuilder: (context, index) => ArticleListTile(article: articles[index]),
+                  )
+                : Container(
+                    height: MediaQuery.of(context).size.height,
+                    alignment: Alignment.center,
+                    child: const Text(
+                      'No articles found',
+                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: 35),
+                    ),
+                  ));
   }
-
-  // searchResultWidget() {
-  //   return ListView.builder(
-  //     physics: const NeverScrollableScrollPhysics(),
-  //     shrinkWrap: true,
-  //     itemCount: Article.articles.length,
-  //     itemBuilder: (context, index) => ArticleListTile(article: Article.articles[index]),
-  //   );
-  // }
 }

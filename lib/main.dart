@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:news_app/common/shared_preferences.dart';
 import 'package:news_app/screen/home_screen.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await SharedPreference.initPref();
   runApp(const NewsApp());
 }
 
@@ -16,10 +19,8 @@ class _NewsAppState extends State<NewsApp> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Ứng dụng xem tin tức',
-      theme: ThemeData(
-          primaryColor: Colors.blue[300],
-          scaffoldBackgroundColor: Colors.white),
+      title: 'Application for newspaper',
+      theme: ThemeData(primaryColor: Colors.blue[300], scaffoldBackgroundColor: Colors.white),
       home: const HomePage(),
     );
   }
